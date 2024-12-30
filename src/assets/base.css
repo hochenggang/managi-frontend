@@ -1,0 +1,90 @@
+:root {
+
+  --color-blue: #66a4ef;
+  --color-green: #1cad70;
+  --color-red: #eb4646;
+
+  --color-bg-1: #333333;
+
+  /* 文字主题色 */
+  --color-font-1: #333333;
+  /* 主要文字颜色，深灰色 */
+  --color-font-2: #555555;
+  /* 次要文字颜色，中灰色 */
+  --color-font-3: #777777;
+  /* 辅助文字颜色，浅灰色 */
+
+  /* 主要色 */
+  --color-primary: #6fa8dc;
+  /* 淡蓝色 */
+  --color-primary-hover: #5c9ed1;
+  /* 淡蓝色悬停状态 */
+
+  /* 次要色 */
+  --color-secondary: #77dd77;
+  /* 淡绿色 */
+  --color-secondary-hover: #66cc66;
+  /* 淡绿色悬停状态 */
+
+  /* 辅助色 */
+  --color-accent: #ffb347;
+  /* 淡橙色，用于强调 */
+  --color-accent-hover: #ffa533;
+  /* 淡橙色悬停状态 */
+
+  /* 背景色 */
+  --color-background-1: #f5faff;
+  /* 一级背景色，极浅蓝色 */
+  --color-background-2: #f0fff0;
+  /* 二级背景色，极浅绿色 */
+  --color-background-3: #ffffff;
+  /* 三级背景色，白色 */
+
+  /* 边框色 */
+  --color-border-1: #cce4f5;
+  /* 主要边框色，浅蓝色 */
+  --color-border-2: #c2e0c2;
+  /* 次要边框色，浅绿色 */
+  --color-border-3: #e0e0e0;
+  /* 辅助边框色，浅灰色 */
+
+  /* Loading组件颜色 */
+  --color-loading-1: #6fa8dc;
+  /* 主要Loading颜色，淡蓝色 */
+  --color-loading-2: #77dd77;
+  /* 次要Loading颜色，淡绿色 */
+}
+
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  box-sizing: border-box;
+  font-weight: normal;
+  text-decoration: none;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--color-font-1);
+  background: var(--color-background-1);
+  line-height: 1.6;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
