@@ -1,3 +1,33 @@
-# managi-frontend
+**项目名称：** manaji  
 
-[{"label":"状态","cmd":"# 获取系统信息\nsystem_info=$(uname -a | awk '{print $1, $2, $3}')\ncpu_info=$(grep -m 1 \"model name\" /proc/cpuinfo | cut -d ':' -f 2 | sed 's/^ *//')\ncpu_cores=$(grep -c ^processor /proc/cpuinfo)\ncpu_usage=$(top -bn1 | grep \"Cpu(s)\" | sed \"s/.*, *\\([0-9.]*\\)%* id.*/\\1/\" | awk '{print 100 - $1\"%\"}')\n\n# 获取所有 /dev/ 开头的磁盘信息\ndisk_info=$(df -h | awk '/^\\/dev\\// {print $1, $3\"/\"$2, \"(\"$5\")\"}' | tr '\\n' ';' | sed 's/;$/ /')\n\n# 获取内存信息\nmemory_total=$(free -m | awk '/Mem:/ {print $2}')\nmemory_used=$(free -m | awk '/Mem:/ {print $3}')\nmemory_percent=$(free -m | awk '/Mem:/ {printf \"%.2f%%\", ($3/$2)*100}')\n\n\n# 获取所有网卡的流量信息，并找到流量最大的网卡\nmax_network_info=$(awk 'NR > 2 {rx+=$2; tx+=$10} END {printf \"%.2fG|%.2fG\", rx/1024/1024/1024, tx/1024/1024/1024}' /proc/net/dev)\n\n# 拆分最大流量的接收和发送部分\nnetwork_in=$(echo \"$max_network_info\" | cut -d '|' -f1)\nnetwork_out=$(echo \"$max_network_info\" | cut -d '|' -f2)\n\n# 获取系统负载\nload_info=$(awk '{printf \"%.2f/%.2f/%.2f\", $1, $2, $3}' /proc/loadavg)\n\n# 获取进程数\nprocess_count=$(ps -e | wc -l)\n\n# 获取连接数\ntcp_connections=$(ss -t | grep -c ESTAB)\nudp_connections=$(ss -u | grep -c UNCONN)\n\n# 获取在线时间\nuptime_seconds=$(awk '{print int($1)}' /proc/uptime)\nuptime_days=$((uptime_seconds / 86400))\n\n# 输出信息\necho \"系统: $system_info\"\necho \"CPU: $cpu_info $cpu_cores Virtual Core ($cpu_usage)\"\necho \"硬盘: $disk_info\"\necho \"内存: $memory_used\"M\"/$memory_total\"M\" ($memory_percent)\"\necho \"流量: IN $network_in OUT $network_out\"\necho \"负载: $load_info\"\necho \"进程数: $process_count\"\necho \"连接数: TCP $tcp_connections UDP $udp_connections\"\necho \"在线: $uptime_days 天\""},{"label":"改密码","cmd":"echo \"$(whoami):Aabbcc\" | sudo chpasswd"}]
+**项目简介：**  
+manaji 是一个开源的VPS管理工具，通过集中化的界面，仅使用SSH通讯，无需在服务器上安装额外软件，即可方便地批量执行命令和查看状态。适合需要把玩多台服务器的场景，简单高效。  
+
+**功能特点：**  
+
+1. **纯SSH通讯**  
+   - 仅依赖SSH连接，无需在服务器上安装任何额外软件，开箱即用。  
+
+2. **批量命令执行**  
+   - 支持将命令同时发送到多台VPS执行，避免逐个登录操作，提升效率。  
+
+3. **集中化管理**  
+   - 所有VPS的登录信息保存在浏览器本地缓存中，支持导入导出，方便迁移和管理。  
+
+4. **轻量简洁**  
+   - 界面简洁，操作直观，专注于核心功能，无多余负担。  
+
+**适用场景：**  
+- 需要同时管理多台VPS的用户  
+- 希望快速批量执行命令的场景  
+- 喜欢轻量化工具的用户  
+
+**技术实现：**  
+- 前端：HTML/CSS/JavaScript  
+- 存储：浏览器本地缓存（LocalStorage  
+
+**开源协议：**  
+本项目采用 [MIT 协议](https://opensource.org/licenses/MIT)，欢迎自由使用和贡献。  
+
+**贡献指南：**  
+欢迎提交Issue和Pull Request，共同改进项目。

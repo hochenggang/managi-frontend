@@ -180,7 +180,7 @@ const confirmDelete = (ip: string) => {
     height: 100%;
     width: 20rem;
     z-index: 2;
-    background-color: var(--color-background-1);
+    background: transparent;
 }
 
 .node-list {
