@@ -14,7 +14,7 @@
 
     <Modal @close="showAddShortcutModal = false" v-if="showAddShortcutModal">
       <h2>保存当前命令为</h2>
-      <input class="shortcut-input" v-model="newShortcutLabel" placeholder="输入快捷命令名称" autofocus/>
+      <input class="shortcut-input" v-model="newShortcutLabel" placeholder="输入快捷命令名称" autofocus />
       <div class="buttons">
         <button @click="confirmAddShortcut">确认</button>
         <button @click="showAddShortcutModal = false">取消</button>
@@ -24,12 +24,16 @@
     <ButtonWithSpinner class="execute-button" :action="executeCommand">
       开始执行
     </ButtonWithSpinner>
-    <ul class="results ">
+    <ul class="results">
       <li v-for="result in executionResults" :key="result.node.ip" class="result">
-        <strong :class="{ 'success': result.success, 'failed': !result.success }">{{ result.node.name }}[{{
-          result.node.ip }}]</strong>
-        <div class="text-lines">
-          <span class="text-line" v-html="result.output.join('<br>')"></span>
+        <strong :class="{ 'success': result.success, 'failed': !result.success }">
+          {{ result.node.name }}[{{ result.node.ip }}]
+        </strong>
+        <div class="output-block" v-show="result.output.join('').length > 0">
+          <pre><code>{{ result.output.join('') }}</code><button class="copy-button" @click="copyCode(result.output.join(''))">Copy</button></pre>
+        </div>
+        <div class="output-block error-block" v-show="result.error.join('').length > 0">
+          <pre><code>{{ result.error.join('') }}</code><button class="copy-button" @click="copyCode(result.error.join(''))">Copy</button></pre>
         </div>
       </li>
     </ul>
@@ -45,7 +49,7 @@ import type { Ref } from 'vue';
 
 import Modal from "@/components/Modal.vue";
 import ButtonWithSpinner from "@/components/ButtonWithSpinner.vue";
-import { handleError } from "@/helper";
+import { handleError, handleMsg } from "@/helper";
 import { testSSH } from '@/api';
 import type { typeCmdsTestResult, typeApiNode } from '@/api';
 
@@ -122,6 +126,15 @@ const executeCommand = async () => {
     }
   }
 };
+
+
+const copyCode = (text: string) => {
+  navigator.clipboard.writeText(text).then(() => {
+    handleMsg('已复制')
+  }).catch(err => {
+    handleError('复制失败: ' + err);
+  });
+};
 </script>
 
 <style scoped>
@@ -174,14 +187,7 @@ const executeCommand = async () => {
 }
 
 .execute-button {
-  font-size: 0.9rem;
-  color: var(--color-blue);
-}
-
-.execute-button:hover {
-  font-size: 0.9rem;
-  background-color: var(--color-blue);
-  color: var(--color-background-1);
+  font-size: 0.8rem;
 }
 
 .results {
@@ -189,15 +195,6 @@ const executeCommand = async () => {
   padding: 0;
   margin-top: 0.5rem;
   list-style: none;
-}
-
-.result {
-  background-color: var(--color-background-3);
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ddd;
-  margin-bottom: 0.5rem;
-  font-size: 0.85rem;
 }
 
 .text-line {
@@ -222,5 +219,66 @@ const executeCommand = async () => {
   color: var(--color-red);
 }
 
+.result {
+  padding: 0.5rem;
+  background-color: var(--color-background-3);
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+}
 
+.output-block {
+  margin: 0.5rem 0;
+  position: relative;
+  background-color: #f4f4f4;
+  border-radius: 5px;
+  overflow-x: auto;
+}
+
+.output-block pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  padding: 0.75rem 0;
+  padding-left: 1rem;
+}
+
+.output-block code {
+  display: block;
+  font-family: monospace;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+
+.output-block::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0.5rem;
+  height: 100%;
+  background-color: #e0e0e0;
+  border-right: 1px solid #ccc;
+}
+
+.error-block::before {
+  background-color: var(--color-orange);
+}
+
+.copy-button {
+  margin: 0;
+  padding: 0;
+  width: auto;
+  min-width: 0.5rem;
+  background: transparent;
+  padding: 0.15rem 0.25rem;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
 </style>

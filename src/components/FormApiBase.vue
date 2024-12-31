@@ -37,7 +37,7 @@ const testApi = async () => {
   <div class="inputs">
     <h2 class="inputs-title">{{ title }}</h2>
     <div class="inputs-box">
-      <input class="inputs-input" type="text" placeholder="hostname[:port]" v-model="inputApiBase" autofocus>
+      <input class="inputs-input" type="text" placeholder="输入Hostname[:port]" v-model="inputApiBase" autofocus>
     </div>
 
     <div class="inputs-buttons">

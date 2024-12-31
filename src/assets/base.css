@@ -1,13 +1,14 @@
 :root {
 
-  --color-blue: #66a4ef;
+  --color-blue: #9ec1eb;
   --color-green: #1cad70;
   --color-red: #eb4646;
+  --color-orange: #f59b00;
 
   --color-bg-1: #333333;
 
   /* 文字主题色 */
-  --color-font-1: #333333;
+  --color-font-1: #555555;
   /* 主要文字颜色，深灰色 */
   --color-font-2: #555555;
   /* 次要文字颜色，中灰色 */

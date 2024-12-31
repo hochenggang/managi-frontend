@@ -77,9 +77,9 @@ const handleLogin = (): Promise<string> => {
     <h2 class="inputs-title">{{ title }}</h2>
     <div class="inputs-box">
       <input class="inputs-input" :class="{ 'inputs-input-alert': user.username.length < 3 }" type="text"
-        placeholder="用户名" v-model="user.username" autofocus>
+        placeholder="输入用户名" v-model="user.username" autofocus>
       <input class="inputs-input" :class="{ 'inputs-input-alert': user.password.length < 6 }" type="text"
-        placeholder="密码" v-model="user.password">
+        placeholder="输入密码" v-model="user.password">
     </div>
     <div class="inputs-buttons">
       <ButtonWithSpinner v-if="adminCount > 0" class="inputs-button" :action="handleLogin">

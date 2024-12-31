@@ -83,9 +83,9 @@ const emitApiHostForm = (value: typeApiPingResult) => {
   margin-bottom: 0.2rem;
   background: transparent;
   padding: 0.5rem;
-  text-align: left;
+  text-align: center;
   width: 100%;
-  font-size: 1rem;
+  font-size: 0.8rem;
   line-height: 1.2rem;
 
 }
