@@ -49,8 +49,8 @@ const initWebSocket = () => {
     return
   }
   const conn = node.value!
-
-  ws = new WebSocket(`ws://${apiHost}/ws`);
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  ws = new WebSocket(`${protocol}//${apiHost}/ws`);
 
   ws.onopen = () => {
     // 发送连接信息
