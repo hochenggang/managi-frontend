@@ -12,8 +12,8 @@
                     </div>
                 </div>
                 <ul class="nodes" v-if="nodesLength > 0">
-                    <li class="node" v-for="node in Object.values(nodes)" :key="node.ip"
-                        @click="toggleNodeSelection(node.ip)">
+                    <li :class="{ 'node': 1, 'ssh-active': currentNode?.ip == node.ip }"
+                        v-for="node in Object.values(nodes)" :key="node.ip" @click="toggleNodeSelection(node.ip)">
                         <div class="node-info">
                             <input type="checkbox" :checked="selectedNodes.includes(node.ip)" />
                             <span :title="`${node.name}[${node.ip}:${node.port}]`"
@@ -22,20 +22,22 @@
                             </span>
                         </div>
                         <div class="node-actions">
-                            <span class="node-edit" @click.stop="editNode(node)">✏️</span>
-                            <span class="node-delete" @click.stop="confirmDelete(node.ip)">❌</span>
+                            <span class="node-action-item" @click.stop="connectNode(node)">💻</span>
+                            <span class="node-action-item" @click.stop="editNode(node)">✏️</span>
+                            <span class="node-action-item" @click.stop="confirmDelete(node.ip)">❌</span>
                         </div>
                     </li>
                 </ul>
-                
+
             </div>
             <div class="node-list-footer buttons">
-                <button @click="removeLogin">退出</button>
                 <button @click="exploreNodes">导出节点</button>
                 <button @click="importNodes">导入节点</button>
             </div>
         </div>
     </div>
+
+    <OperationXTerm v-if="currentNode" @close="currentNode = null" :node="currentNode" />
 </template>
 
 <script setup lang="ts">
@@ -46,8 +48,10 @@ import type { Ref } from "vue";
 import { handleError, handleMsg } from "@/helper";
 
 import AddNode from '@/components/AddNode.vue';
-import { setCachedToken, setCachedNodes } from "@/api";
+import { setCachedNodes } from "@/api";
 import type { typeApiNode } from "@/api";
+import OperationXTerm from '@/components/OperationXTerm.vue'
+
 
 const router = useRouter();
 const nodes = inject('nodes') as Ref<Record<string, typeApiNode>>;
@@ -62,11 +66,6 @@ const newNode = ref<typeApiNode>({
     auth_type: 'password',
     auth_value: ''
 });
-
-const removeLogin = () => {
-    setCachedToken('');
-    router.push('/');
-};
 
 const isSelectAll = computed(() => {
     if (nodes.value) {
@@ -100,6 +99,20 @@ const editNode = (node: typeApiNode) => {
     newNode.value = node;
     showAddNodeModal.value = true;
 };
+
+
+
+const currentNode = ref<null | typeApiNode>(null)
+const connectNode = (node: typeApiNode) => {
+    if (currentNode.value && node.ip === currentNode.value.ip) {
+        return
+    }
+    currentNode.value = null
+    setTimeout(() => {
+        currentNode.value = node
+    }, 50)
+};
+
 
 const exploreNodes = () => {
     if (nodesLength.value === 0) {
@@ -264,6 +277,10 @@ const confirmDelete = (ip: string) => {
     color: #ff4d4f;
 }
 
+.node-action-item {
+    margin: 0 0.15rem;
+}
+
 .node:hover .node-actions {
     display: block;
 }
@@ -277,5 +294,13 @@ const confirmDelete = (ip: string) => {
 .node-list-footer>button {
     background: transparent;
     font-size: 0.8rem;
+}
+
+.ssh-active {
+    background-color: var(--color-border-1);
+}
+
+* {
+    overflow: hidden;
 }
 </style>

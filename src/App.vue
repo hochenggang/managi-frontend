@@ -65,4 +65,8 @@ h2 {
   justify-content: space-between;
   gap: 0.25rem;
 }
+
+.xterm-viewport {
+  height: 100%;
+}
 </style>

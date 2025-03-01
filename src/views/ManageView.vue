@@ -8,25 +8,14 @@ import NodeList from '@/components/NodeList.vue';
 import OperationPanel from '@/components/OperationPanel.vue';
 
 import { handleError, handleMsg } from "@/helper";
-import { getTokenInfo, setCachedNodes, getCachedNodes } from "@/api";
-import type { typeApiTokenInfoResult, typeApiNode } from "@/api";
+import {  setCachedNodes, getCachedNodes } from "@/api";
+import type { typeApiNode } from "@/api";
 
 const router = useRouter();
-const tokenInfo = ref<typeApiTokenInfoResult>();
-
-onBeforeMount(() => {
-  getTokenInfo().then((value) => {
-    tokenInfo.value = value as typeApiTokenInfoResult;
-  }).catch((err) => {
-    handleError(err);
-    if (err.indexOf('401') > 0) {
-      router.push('/');
-    }
-  });
-});
 
 
 const nodes = ref<Record<string, typeApiNode>>(getCachedNodes());
+
 watch(nodes, () => {
   setCachedNodes(nodes.value);
   handleMsg('节点数据已更新到浏览器 LocalStorage');
@@ -39,10 +28,7 @@ provide('nodes', nodes);
 
 <template>
   <main>
-    <FullCenter v-if="!tokenInfo">
-      <Spinner :size="30" />
-    </FullCenter>
-    <div class="container scroll" v-if="tokenInfo">
+    <div class="container scroll">
       <NodeList />
       <OperationPanel />
     </div>
