@@ -6,7 +6,9 @@
         @click="fillCommand(shortcut.label, shortcut.cmd)" @mouseover="hoverIndex = index"
         @mouseleave="hoverIndex = -1">
         {{ shortcut.label }}
-        <span class="delete-icon" v-if="hoverIndex === index" @click.stop="deleteShortcut(index)">❌</span>
+        <Fade>
+          <span class="delete-icon" v-if="hoverIndex === index" @click.stop="deleteShortcut(index)">❌</span>
+        </Fade>
       </button>
       <button class="shortcut" @click="startAddShortcut">+</button>
     </div>
@@ -52,6 +54,7 @@ import ButtonWithSpinner from "@/components/ButtonWithSpinner.vue";
 import { handleError, handleMsg } from "@/helper";
 import { testSSH } from '@/api';
 import type { typeCmdsTestResult, typeApiNode } from '@/api';
+import Fade from "@/components/Fade.vue";
 
 const nodes = inject('nodes') as Ref<Record<string, typeApiNode>>;
 const selectedNodes = inject('selectedNodes') as Ref<string[]>;
@@ -79,7 +82,7 @@ const fillCommand = (label: string, cmd: string) => {
 
 const startAddShortcut = () => {
   if (command.value.length < 2) {
-    handleError('命令行输入框是空的，无法保存为快捷命令');
+    handleError('输入框里面似乎没东西，无法保存为快捷命令');
   } else {
     showAddShortcutModal.value = true;
   }
@@ -107,10 +110,10 @@ const deleteShortcut = (index: number) => {
 
 const executeCommand = async () => {
   if (command.value.length < 2) {
-    throw '输入的命令至少需要2个字符';
+    throw '输入框里面似乎没东西';
   }
   if (selectedNodes.value.length === 0) {
-    throw '请选择需要执行的节点';
+    throw '似乎还没有选择节点';
   }
   executionResults.value = [];
   for (const ip of selectedNodes.value) {
@@ -120,9 +123,7 @@ const executeCommand = async () => {
       executionResults.value.push(result);
     } catch (error: any) {
       console.log(error);
-      if (error.indexOf('401') > 0) {
-        handleError('控制平面登录已过期 请重新登录');
-      }
+      handleError(error);
     }
   }
 };
@@ -174,6 +175,7 @@ const copyCode = (text: string) => {
   min-width: 0.5rem;
   font-size: 0.8rem;
   line-height: 1rem;
+  transition: all 0.2s ease-in-out;
 }
 
 .shortcut-input {

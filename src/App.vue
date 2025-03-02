@@ -66,7 +66,17 @@ h2 {
   gap: 0.25rem;
 }
 
-.xterm-viewport {
-  height: 100%;
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  scrollbar-width: none;
+}
+
+
+* {
+  overflow: scroll;
 }
 </style>

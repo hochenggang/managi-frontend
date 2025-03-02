@@ -4,7 +4,7 @@
         <div class="node-list">
             <div class="node-list-body">
                 <div class="header">
-                    <span class="header-title">节点列表</span>
+                    <span class="header-title">{{ nodesLength }}个节点</span>
                     <div class="header-actions buttons">
                         <button @click="selectAll" v-show="!isSelectAll && nodesLength > 0">全选</button>
                         <button @click="deselectAll" v-show="isSelectAll && nodesLength > 0">全不选</button>
@@ -21,11 +21,13 @@
                                 {{ node.name }}
                             </span>
                         </div>
-                        <div class="node-actions">
-                            <span class="node-action-item" @click.stop="connectNode(node)">💻</span>
-                            <span class="node-action-item" @click.stop="editNode(node)">✏️</span>
-                            <span class="node-action-item" @click.stop="confirmDelete(node.ip)">❌</span>
-                        </div>
+                        <Fade>
+                            <div class="node-actions">
+                                <span class="node-action-item" @click.stop="connectNode(node)">💻</span>
+                                <span class="node-action-item" @click.stop="editNode(node)">✏️</span>
+                                <span class="node-action-item" @click.stop="confirmDelete(node.ip)">❌</span>
+                            </div>
+                        </Fade>
                     </li>
                 </ul>
 
@@ -51,6 +53,7 @@ import AddNode from '@/components/AddNode.vue';
 import { setCachedNodes } from "@/api";
 import type { typeApiNode } from "@/api";
 import OperationXTerm from '@/components/OperationXTerm.vue'
+import Fade from "@/components/Fade.vue";
 
 
 const router = useRouter();
@@ -236,6 +239,7 @@ const confirmDelete = (ip: string) => {
 }
 
 .node {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -273,8 +277,14 @@ const confirmDelete = (ip: string) => {
 
 .node-actions {
     display: none;
-    cursor: pointer;
     color: #ff4d4f;
+    position: absolute;
+    width: 0;
+    right: 0;
+    opacity: 0;
+    transition: opacity 0.5s ease, width 0.5s ease;
+    background-color: var(--color-border-1);
+
 }
 
 .node-action-item {
@@ -283,6 +293,8 @@ const confirmDelete = (ip: string) => {
 
 .node:hover .node-actions {
     display: block;
+    width: auto;
+    opacity: 1;
 }
 
 .selected {
