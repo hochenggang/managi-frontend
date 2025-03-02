@@ -10,6 +10,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { apiHost } from '@/api'
 import { Terminal } from '@xterm/xterm';
+import { handleError, handleMsg } from "@/helper";
 import type { typeApiNode } from '@/api';
 import '@xterm/xterm/css/xterm.css';
 
@@ -38,6 +39,8 @@ const terminal = new Terminal({
     cursor: '#839496',     // 光标颜色
   },
 });
+
+
 const terminalContainer = ref<HTMLElement | null>(null);
 
 // WebSocket 实例
@@ -89,6 +92,17 @@ const initTerminal = () => {
     terminal.onData((data) => {
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(data); // 将用户输入发送到 WebSocket
+      }
+    });
+
+    terminal.onSelectionChange(() => {
+      const selection = terminal.getSelection();
+      if (selection) {
+        navigator.clipboard.writeText(selection).then(() => {
+          handleMsg('已复制')
+        }).catch((err) => {
+          console.error('自动复制失败:', err);
+        });
       }
     });
 
