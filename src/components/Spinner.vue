@@ -4,8 +4,8 @@
     'height': props.size + 'px',
   }">
     <div class="loading-spinner" :style="{
-      'border': props.thicknesses + 'px solid var(--color-loading-1)',
-      'border-top': props.thicknesses + 'px solid var(--color-border-1)',
+      'border': props.thicknesses + 'px solid var(--color-main)',
+      'border-top': props.thicknesses + 'px solid var(--color-sub)',
     }"></div>
   </div>
 </template>
@@ -14,11 +14,11 @@
 const props = defineProps({
   size: {
     type: Number,
-    default: 20,
+    default: 15,
   },
   thicknesses: {
     type: Number,
-    default: 4,
+    default: 3,
   }
 });
 </script>

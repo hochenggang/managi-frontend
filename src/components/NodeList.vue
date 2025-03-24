@@ -315,7 +315,7 @@ const confirmDelete = (ip: string) => {
 }
 
 .ssh-active {
-    background-color: var(--color-border-1);
+    background-color: var(--color-sub);
 }
 
 .footer-title {

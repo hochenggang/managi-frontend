@@ -27,11 +27,11 @@ const props = defineProps({
   },
   size: {
     type: Number,
-    default: 20,
+    default: 16,
   },
   thicknesses: {
     type: Number,
-    default: 4,
+    default: 3,
   },
 });
 

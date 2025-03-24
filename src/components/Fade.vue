@@ -7,7 +7,7 @@
   <style scoped>
   .fade-width-enter-active,
   .fade-width-leave-active {
-    transition: opacity 0.15s ease-in;
+    transition: opacity 0.25s ease-in-out;
   }
   
   .fade-width-enter-from {
