@@ -38,6 +38,7 @@ type typeCmds = string[]
 
 const getCachedNodes = (): Record<string, typeApiNode> => {
     const cachedNodes = localStorage.getItem('cached-nodes');
+    
     return cachedNodes ? JSON.parse(cachedNodes) : {};
 };
 

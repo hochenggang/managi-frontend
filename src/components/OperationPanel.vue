@@ -1,44 +1,50 @@
 <template>
   <div class="operation-panel " v-if="Object.keys(nodes).length > 0">
-    <div class="shortcuts buttons">
-      <span class="shortcuts-note">快捷命令</span>
-      <button class="shortcut" v-for="(shortcut, index) in shortcuts" :key="index"
-        @click="fillCommand(shortcut.label, shortcut.cmd)" @mouseover="hoverIndex = index"
-        @mouseleave="hoverIndex = -1">
-        {{ shortcut.label }}
-        <Fade>
-          <span class="delete-icon" v-if="hoverIndex === index" @click.stop="deleteShortcut(index)">❌</span>
-        </Fade>
-      </button>
-      <button class="shortcut" @click="startAddShortcut">+</button>
-    </div>
-    <textarea v-model="command" placeholder="在此输入 Shell 命令行" class="command-input"></textarea>
-
-    <Modal @close="showAddShortcutModal = false" v-if="showAddShortcutModal">
-      <h2>保存当前命令为</h2>
-      <input class="shortcut-input" v-model="newShortcutLabel" placeholder="输入快捷命令名称" autofocus />
-      <div class="buttons">
-        <button @click="confirmAddShortcut">确认</button>
-        <button @click="showAddShortcutModal = false">取消</button>
+    <div class="bar ">
+      <div class="buttons shortcuts ">
+        <span class="shortcuts-note shortcut">快捷命令</span>
+        <button class="small-button shortcut" v-for="(shortcut, index) in shortcuts" :key="index"
+          @click="fillCommand(shortcut.label, shortcut.cmd)" @mouseover="hoverIndex = index"
+          @mouseleave="hoverIndex = -1">
+          {{ shortcut.label }}
+          <Fade>
+            <IconDelete class="delete-icon" v-if="hoverIndex === index" @click.stop="deleteShortcut(index)" />
+          </Fade>
+        </button>
+        <button class="small-button shortcut" @click="startAddShortcut">+</button>
       </div>
-    </Modal>
+    </div>
+    <div class="command-container ">
 
-    <ButtonWithSpinner class="execute-button" :action="executeCommand">
-      开始执行
-    </ButtonWithSpinner>
-    <ul class="results">
-      <li v-for="result in executionResults" :key="result.node.ip" class="result">
-        <strong :class="{ 'success': result.success, 'failed': !result.success }">
-          {{ result.node.name }}[{{ result.node.ip }}]
-        </strong>
-        <div class="output-block" v-show="result.output.join('').length > 0">
-          <pre><code>{{ result.output.join('') }}</code><button class="copy-button" @click="copyCode(result.output.join(''))">Copy</button></pre>
+      <textarea v-model="command" placeholder="在此输入 Shell 命令行" class="command-input"></textarea>
+
+      <Modal @close="showAddShortcutModal = false" v-if="showAddShortcutModal">
+        <h2>保存当前命令为</h2>
+        <input class="shortcut-input" v-focus v-model="newShortcutLabel" placeholder="输入快捷命令名称" />
+        <div class="buttons">
+          <button @click="confirmAddShortcut">确认</button>
+          <button @click="showAddShortcutModal = false">取消</button>
         </div>
-        <div class="output-block error-block" v-show="result.error.join('').length > 0">
-          <pre><code>{{ result.error.join('') }}</code><button class="copy-button" @click="copyCode(result.error.join(''))">Copy</button></pre>
-        </div>
-      </li>
-    </ul>
+      </Modal>
+
+      <ButtonWithSpinner class="execute-button" :action="executeCommand">
+        开始执行
+      </ButtonWithSpinner>
+      <ul class="results">
+        <li v-for="result in executionResults" :key="result.node.ip" class="result">
+          <strong :class="{ 'success': result.success, 'failed': !result.success }">
+            {{ result.node.name }}[{{ result.node.ip }}]
+          </strong>
+          <div class="output-block" v-show="result.output.join('').length > 0">
+            <pre><code>{{ result.output.join('') }}</code><button class="copy-button" @click="copyCode(result.output.join(''))">Copy</button></pre>
+          </div>
+          <div class="output-block error-block" v-show="result.error.join('').length > 0">
+            <pre><code>{{ result.error.join('') }}</code><button class="copy-button" @click="copyCode(result.error.join(''))">Copy</button></pre>
+          </div>
+        </li>
+      </ul>
+    </div>
+
   </div>
   <div class="operation-panel full-center" v-if="Object.keys(nodes).length === 0">
     <p>添加一个节点以继续</p>
@@ -54,6 +60,7 @@ import ButtonWithSpinner from "@/components/ButtonWithSpinner.vue";
 import { handleError, handleMsg } from "@/helper";
 import { testSSH } from '@/api';
 import type { typeCmdsTestResult, typeApiNode } from '@/api';
+import IconDelete from "@/components/icons/IconDelete.vue";
 import Fade from "@/components/Fade.vue";
 
 const nodes = inject('nodes') as Ref<Record<string, typeApiNode>>;
@@ -113,7 +120,7 @@ const executeCommand = async () => {
     throw '输入框里面似乎没东西';
   }
   if (selectedNodes.value.length === 0) {
-    throw '似乎还没有选择节点';
+    throw '请选择至少1个节点再执行命令';
   }
   executionResults.value = [];
   for (const ip of selectedNodes.value) {
@@ -143,38 +150,30 @@ const copyCode = (text: string) => {
   position: fixed;
   right: 0;
   top: 0;
-  width: calc(100% - 20rem);
-  padding: 1rem;
-  z-index: 2;
   height: 100%;
+  width: calc(100% - 20rem);
+  z-index: 2;
   overflow: auto;
+  background-color: var(--color-bg);
 }
 
 
-
-.command-input {
-  width: 100%;
-  height: 100px;
-  padding: 10px;
-  background-color: var(--color-background-3);
-  font-size: 0.8rem;
-}
 
 .shortcuts {
   margin: 0.5rem 0;
+  flex-wrap: no-wrap;
   justify-content: left;
 }
 
 .shortcuts-note {
   font-size: 0.85rem;
-  font-weight: lighter;
+  color: var(--color-font-1);
 }
 
+
 .shortcut {
+  flex-shrink: 0;
   width: auto;
-  min-width: 0.5rem;
-  font-size: 0.8rem;
-  line-height: 1rem;
   transition: all 0.2s ease-in-out;
 }
 
@@ -185,7 +184,22 @@ const copyCode = (text: string) => {
 
 .delete-icon {
   cursor: pointer;
-  font-size: 12px;
+  width: 0.65rem;
+  height: 0.65rem;
+}
+
+
+
+.command-container {
+  padding: 0.5rem;
+}
+
+.command-input {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  background-color: var(--color-background-3);
+  font-size: 0.8rem;
 }
 
 .execute-button {
