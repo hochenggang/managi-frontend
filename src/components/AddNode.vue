@@ -1,37 +1,38 @@
 <template>
   <Modal @close="emits('close')">
-    <h2>添加节点</h2>
+    <h2>{{ t("addNode.title") }}</h2>
     <form @submit.prevent="handleSubmit">
       <label>
-        备注:
-        <input v-model="newNode.name" placeholder="输入服务器别名" required />
+        {{ t("addNode.name") }}
+        <input v-model="newNode.name" :placeholder="t('addNode.namePlaceholder')" required />
       </label>
       <label>
-        域名或IP地址:
-        <input v-model="newNode.ip" placeholder="输入服务器地址: IPV4/IPV6/DOMAIN" required />
+        {{ t("addNode.host") }}
+        <input v-model="newNode.host" :placeholder="t('addNode.hostPlaceholder')" required />
       </label>
       <label>
-        SSH 端口:
-        <input v-model="newNode.port" type="number" placeholder="输入SSH端口" required />
+        {{ t("addNode.port") }}
+        <input v-model="newNode.port" type="number" :placeholder="t('addNode.portPlaceholder')" required />
       </label>
       <label>
-        SSH 用户名:
-        <input v-model="newNode.ssh_username" placeholder="输入用户名" required />
+        {{ t("addNode.username") }}
+        <input v-model="newNode.username" :placeholder="t('addNode.usernamePlaceholder')" required />
       </label>
       <label>
-        认证类型:
+        {{ t("addNode.authType") }}
         <select v-model="newNode.auth_type" required>
-          <option value="password">密码认证</option>
-          <option value="key">密钥认证</option>
+          <option value="password">{{ t("addNode.authTypePassword") }}</option>
+          <option value="key">{{ t("addNode.authTypePrivateKey") }}</option>
         </select>
       </label>
       <label>
-        密码或密钥:
-        <textarea v-model="newNode.auth_value" :placeholder="newNode.auth_type === 'password' ? '输入密码' : '输入密钥'"
+        {{ t("addNode.authValue") }}
+
+        <textarea v-model="newNode.auth_value" placeholder=""
           required></textarea>
       </label>
-      <button type="submit">保存</button>
-      <button type="button" @click="$emit('close')">取消</button>
+      <button type="submit">{{ t("addNode.actions.save") }}</button>
+      <button type="button" @click="$emit('close')">{{ t("addNode.actions.cancel") }}</button>
     </form>
   </Modal>
 </template>
@@ -41,6 +42,13 @@ import { ref } from 'vue';
 
 import Modal from "@/components/Modal.vue";
 import type { typeApiNode } from "@/api";
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n({
+  inheritLocale: true,
+  useScope: 'global'
+})
+
 
 const emits = defineEmits(['addNode', 'close']);
 const props = defineProps({
@@ -48,9 +56,9 @@ const props = defineProps({
     type: Object as () => typeApiNode,
     default: () => ({
       name: '',
-      ip: '',
+      host: '',
       port: 22,
-      ssh_username: 'root',
+      username: 'root',
       auth_type: 'password',
       auth_value: '',
     })

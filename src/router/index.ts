@@ -1,13 +1,21 @@
 import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
-import ManageView from '../views/ManageView.vue'
+import CmdsView from '../views/CmdsView.vue'
+import XtremView from '../views/XtremView.vue'
+import type { typeApiNode } from '@/api';
+
 
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [
     {
       path: '/',
-      name: 'manage',
-      component: ManageView,
+      name: 'cmds',
+      component: CmdsView,
+    },
+    {
+      path: '/xterm',
+      name: 'xterm',
+      component: XtremView,
     },
   ],
 })

@@ -1,0 +1,61 @@
+{
+    "header": {
+        "total": "Total",
+        "nodes": "nodes",
+        "choosed": "Selected",
+        "actions": {
+            "all": "All",
+            "none": "None",
+            "add": "Add node"
+        }
+    },
+    "footer": {
+        "actions": {
+            "export": "Export",
+            "import": "Import"
+        }
+    },
+    "addNode": {
+        "title": "Add Node",
+        "name": "Name:",
+        "namePlaceholder": "Enter nickname for node.",
+        "host": "IP or Domain:",
+        "hostPlaceholder": "Enter ip or domain.",
+        "port": "Port Number:",
+        "portPlaceholder": "Enter ssh port number.",
+        "username": "SSH Username:",
+        "usernamePlaceholder": "Enter ssh username.",
+        "authType": "Auth Type:",
+        "authTypePassword": "Password",
+        "authTypePrivateKey": "Private Key",
+        "authValue": "Password or Private Key",
+        "authValuePlaceholder": "Enter value of Password or Private Key.",
+        "actions": {
+            "save": "Save",
+            "cancel": "Cancel"
+        },
+        "importSucess": "Import Sucessful",
+        "importError": "Import Failed"
+    },
+    "cmdPanel": {
+        "shortcut": "Shortcut Command: ",
+        "commandPlaceholder": "Enter Shell command here",
+        "saveShortCut": "Save current command as",
+        "saveShortCutPlaceholder": "Enter shortcut command name",
+        "confirmAddShortcut": "Confirm",
+        "cancelShortCut": "Cancel",
+        "executeCommand": "Execute",
+        "addNodeToContinue": "Add a node to proceed",
+        "noCmd": "Input is empty. Cannot save as a shortcut.",
+        "shortcutNameRequired": "Enter a shortcut name.",
+        "shortcutDeleteConfirm": "Delete this shortcut?",
+        "emptyCmd": "Input is empty.",
+        "nothingSelected": "Select at least one node to proceed.",
+        "copied": "Copied.",
+        "copyError": "Copy failed."
+    },
+    "xtermPanel": {
+        "back": "Back",
+        "hello": "Hover over a node on the left and click the terminal icon to open a connection."
+    }
+}

@@ -6,12 +6,7 @@
 
 <script lang="ts" setup>
 
-// defineProps({
-//   zIndex: {
-//     type: Number,
-//     default: 2,
-//   }
-// })
+
 
 </script>
 
