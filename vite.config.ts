@@ -19,7 +19,4 @@ export default defineConfig({
     },
   },
   base: '/',
-  optimizeDeps: {
-    include: ['vue-i18n']
-  }
 })

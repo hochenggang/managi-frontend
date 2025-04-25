@@ -17,6 +17,8 @@
 import { ref, watch, onUnmounted, onMounted, getCurrentInstance } from 'vue';
 import { Terminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
+import { FitAddon } from '@xterm/addon-fit';
+
 
 import { apiHost } from '@/api';
 import { handleError, handleMsg } from "@/helper";
@@ -32,7 +34,6 @@ const nodesStore = useNodesStore();
 
 const { t } = useI18n()
 
-
 const handleBack = () => {
   router.push({ name: 'cmds' })
 }
@@ -47,6 +48,10 @@ const terminal = new Terminal({
     cursor: '#839496',     // 光标颜色
   },
 });
+
+// 自动尺寸调整
+const fitAddon = new FitAddon();
+terminal.loadAddon(fitAddon);
 
 
 const terminalContainer = ref<HTMLElement | null>(null);
@@ -92,6 +97,8 @@ const initTerminal = () => {
   if (terminalContainer.value) {
 
     terminal.open(terminalContainer.value);
+    fitAddon.fit();
+
     terminal.focus();
 
     // 绑定输入事件

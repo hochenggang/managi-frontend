@@ -45,7 +45,8 @@
                         <option value="en">English</option>
                         <option value="zh">中文</option>
                     </select>
-                    <button class="small-button" @click="exploreNodes">{{ t("footer.actions.export") }}</button>
+                    <button class="small-button" v-show="nodesLength > 0" @click="exploreNodes">{{
+                        t("footer.actions.export") }}</button>
                     <button class="small-button" @click="importNodes">{{ t("footer.actions.import") }}</button>
                 </div>
             </div>
@@ -150,7 +151,6 @@ const connectNode = (node: typeApiNode) => {
 
 const exploreNodes = () => {
     if (nodesLength.value === 0) {
-        handleError('没有节点数据可以导出');
         return
     }
     // 导出 nodes 为json文件
@@ -161,7 +161,7 @@ const exploreNodes = () => {
     a.download = `nodes-${new Date().getTime()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    handleMsg('节点导出成功');
+    handleMsg(t("addNode.exportSucess"));
 }
 
 const importNodes = () => {
@@ -177,15 +177,15 @@ const importNodes = () => {
             reader.onload = () => {
                 try {
                     const inputNodes = JSON.parse(reader.result as string);
-                    // 进行数据校验，nodes需要是一个字典，key为string，值为 typeApiNode
+                    // 进行数据校验，nodes需要是一个字典，key为string，值为 typeApiNode or typeOldApiNode
                     if (typeof inputNodes === 'object') {
                         console.log(inputNodes)
                         for (const key1 in inputNodes) {
-                            // nodes[key] 为包含[name, ip, port, ssh_username, auth_type, auth_value]的对象
-                            const requiredKeys = ['name', 'ip', 'port', 'ssh_username', 'auth_type', 'auth_value'];
+                            // nodes[key] 为包含[port, auth_type, auth_value]的对象
+                            const requiredKeys = ['port', 'auth_type', 'auth_value'];
                             for (const key2 of requiredKeys) {
                                 if (!inputNodes[key1].hasOwnProperty(key2)) {
-                                    handleError(`数据错误，节点 [${key1}] 缺失 ${key2} 字段`);
+                                    handleError(`${t("addNode.importError")} -> [${key1}].${key2} `);
                                     return;
                                 }
                             }

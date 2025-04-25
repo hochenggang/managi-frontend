@@ -35,7 +35,9 @@
             "cancel": "取消"
         },
         "importSucess": "节点导入成功",
-        "importError": "节点导入失败"
+        "importError": "节点导入失败",
+        "exportSucess": "节点导出成功"
+
     },
     "cmdPanel": {
         "shortcut": "快捷命令：",

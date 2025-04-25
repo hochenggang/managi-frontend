@@ -35,7 +35,8 @@
             "cancel": "Cancel"
         },
         "importSucess": "Import Sucessful",
-        "importError": "Import Failed"
+        "importError": "Import Failed",
+        "exportSucess": "Export Sucessful"
     },
     "cmdPanel": {
         "shortcut": "Shortcut Command: ",
