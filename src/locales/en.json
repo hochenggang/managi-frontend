@@ -16,7 +16,7 @@
         }
     },
     "addNode": {
-        "title": "Add Node",
+        "title": "Edit Node",
         "name": "Name:",
         "namePlaceholder": "Enter nickname for node.",
         "host": "IP or Domain:",
@@ -56,7 +56,39 @@
         "copyError": "Copy failed."
     },
     "xtermPanel": {
+        "finder": "File Manager",
         "back": "Back",
         "hello": "Hover over a node on the left and click the terminal icon to open a connection."
+    },
+    "finder": {
+        "actions": {
+            "reflush": "Reflush",
+            "newDir": "New Dir",
+            "upload": "Upload",
+            "download": "Download",
+            "delete": "Delete"
+        },
+        "filename": "Filename",
+        "size": "Size",
+        "mtime": "Mtime",
+        "loading": "Loading...",
+        "empty": "Empty",
+        "upDir": "..",
+        "connectting": "Connectting",
+        "disconnected": "Connection lost",
+        "reconnecting": "Reconnecting soon",
+        "error": "An error occurred",
+        "downloaded": "Download completed",
+        "uploaded": "Upload completed",
+        "deleteConfire": "Are you sure you want to delete this?",
+        "ok": "Confirm",
+        "cancle": "Cancel",
+        "newDirPlaceholder": "Enter folder name",
+        "newDir": "New Folder",
+        "total":"Total",
+        "item":"items",
+        "current":", Selected ",
+        "file":"File",
+        "dir":"Dir"
     }
 }

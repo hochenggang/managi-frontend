@@ -22,7 +22,6 @@ textarea {
   border-radius: 0.2rem;
   border: 1.25px solid var(--color-main);
   padding: 0.25rem 0.5rem;
-  min-width: 5rem;
   width: 100%;
   background-color: var(--color-bg);
   background-repeat: no-repeat;

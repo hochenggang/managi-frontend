@@ -1,4 +1,5 @@
 <template>
+    <Finder v-if="finderNode" :node="finderNode" @close="finderNode = null" />
     <AddNode v-if="showAddNodeModal" :node="newNode" @close="showAddNodeModal = false" @add-node="handleAddNode" />
     <div class="node-list-container">
         <div class="node-list">
@@ -28,9 +29,10 @@
                         </div>
                     </div>
                     <div class="buttons node-actions">
-                        <IconTerm @click.stop="connectNode(node)" />
-                        <IconEdit @click.stop="editNode(node)" />
-                        <IconDelete @click.stop="confirmDelete(node)" />
+                        <IconFinder title="文件管理" @click.stop="openFinder(node)" />
+                        <IconTerm title="终端" @click.stop="connectNode(node)" />
+                        <IconEdit title="编辑节点" @click.stop="editNode(node)" />
+                        <IconDelete title="删除节点" @click.stop="confirmDelete(node)" />
                     </div>
                 </li>
             </ul>
@@ -62,6 +64,9 @@ import AddNode from '@/components/AddNode.vue';
 import IconDelete from '@/components/icons/IconDelete.vue'
 import IconEdit from '@/components/icons/IconEdit.vue'
 import IconTerm from '@/components/icons/IconTerm.vue'
+import IconFinder from '@/components/icons/IconFinder.vue'
+import Finder from '@/components/Finder.vue'
+
 
 import { useI18n } from 'vue-i18n'
 import { handleError, handleMsg } from "@/helper";
@@ -72,6 +77,7 @@ import { useNodesStore, generateNodeId } from '@/stores/nodesStore';
 
 const router = useRouter();
 const nodesStore = useNodesStore();
+const finderNode = ref<typeApiNode | null>(null);
 
 const { t, locale } = useI18n()
 
@@ -148,6 +154,10 @@ const connectNode = (node: typeApiNode) => {
     nodesStore.setXtermNode(node)
     router.push({ name: 'xterm' })
 };
+
+const openFinder = (node: typeApiNode) => {
+    finderNode.value = node
+}
 
 const exploreNodes = () => {
     if (nodesLength.value === 0) {
@@ -310,7 +320,8 @@ watch(nodesStore.nodes, () => {
     right: 0.5rem;
     opacity: 1;
     transition: opacity 0.5s ease-in;
-    background-color: var(--color-sub);
+    padding-left: 0.75rem;
+    background: linear-gradient(to right, transparent, var(--color-sub) 0.5rem);
 
 }
 

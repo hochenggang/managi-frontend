@@ -39,10 +39,10 @@
               {{ nodesStore.getNodeById(generateNodeId(result.node)).name }}
             </strong>
             <div class="output-block" v-show="result.output.join('').length > 0">
-              <pre><code>{{ result.output.join('') }}</code><button class=" small-button copy-button" @click="copyCode(result.output.join(''))">Copy</button></pre>
+              <pre><code>{{ result.output.join('\n') }}</code><button class=" small-button copy-button" @click="copyCode(result.output.join(''))">Copy</button></pre>
             </div>
             <div class="output-block error-block" v-show="result.error.join('').length > 0">
-              <pre><code>{{ result.error.join('') }}</code><button class=" small-button copy-button" @click="copyCode(result.error.join(''))">Copy</button></pre>
+              <pre><code>{{ result.error.join('\n') }}</code><button class=" small-button copy-button" @click="copyCode(result.error.join(''))">Copy</button></pre>
             </div>
           </li>
         </ul>

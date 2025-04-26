@@ -39,7 +39,6 @@ const handleBack = () => {
 }
 
 
-
 // 终端实例
 const terminal = new Terminal({
   theme: {

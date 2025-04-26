@@ -23,13 +23,12 @@ const emits = defineEmits(['close'])
   justify-content: center;
   align-items: center;
   z-index: 100;
+  cursor: pointer;
 }
 
 .modal {
+  border-radius: 3px;
+  position: absolute;
   background: var(--color-while);
-  padding: 2rem;
-  border-radius: 5px;
-  width: 25rem;
 }
-
 </style>

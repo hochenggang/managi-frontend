@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
 import CmdsView from '../views/CmdsView.vue'
 import XtremView from '../views/XtremView.vue'
-import type { typeApiNode } from '@/api';
 
 
 const router = createRouter({
@@ -17,6 +16,7 @@ const router = createRouter({
       name: 'xterm',
       component: XtremView,
     },
+
   ],
 })
 

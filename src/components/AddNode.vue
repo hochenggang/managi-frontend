@@ -1,5 +1,7 @@
 <template>
   <Modal @close="emits('close')">
+    <main class="modal-content">
+      
     <h2>{{ t("addNode.title") }}</h2>
     <form @submit.prevent="handleSubmit">
       <label>
@@ -34,6 +36,8 @@
       <button type="submit">{{ t("addNode.actions.save") }}</button>
       <button type="button" @click="$emit('close')">{{ t("addNode.actions.cancel") }}</button>
     </form>
+    
+  </main>
   </Modal>
 </template>
 
@@ -73,6 +77,11 @@ const handleSubmit = () => {
 </script>
 
 <style scoped>
+
+.modal-content {
+  width: 25rem;
+  padding: 2rem;
+}
 h2 {
   width: 100%;
   text-align: center;

@@ -5,3 +5,13 @@
       fill="#DE5347"></path>
   </svg>
 </template>
+
+<style scoped>
+.icon {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+</style>
+
+

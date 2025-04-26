@@ -16,7 +16,7 @@
         }
     },
     "addNode": {
-        "title": "添加节点",
+        "title": "编辑节点",
         "name": "备注名：",
         "namePlaceholder": "输入节点别名",
         "host": "IP地址或域名：",
@@ -57,7 +57,39 @@
         "copyError": "复制失败"
     },
     "xtermPanel": {
+        "finder": "文件管理",
         "back": "返回",
         "hello": "鼠标浮在左侧节点上，点击终端图标来开启一个连接吧"
+    },
+    "finder":{
+        "actions":{
+            "reflush":"刷新",
+            "newDir":"新建文件夹",
+            "upload":"上传文件",
+            "download":"下载文件",
+            "delete":"删除文件"
+        },
+        "filename":"文件名",
+        "size":"文件大小",
+        "mtime":"修改时间",
+        "loading":"加载中...",
+        "empty":"空文件夹",
+        "upDir":"..",
+        "connectting":"正在连接",
+        "disconnected":"连接已断开",
+        "reconnecting":"即将重连",
+        "error":"出现错误",
+        "downloaded":"下载完成",
+        "uploaded":"上传完成",
+        "deleteConfire":"确认删除吗？",
+        "ok":"确定",
+        "cancle":"取消",
+        "newDirPlaceholder":"输入文件夹名称",
+        "newDir":"新建文件夹",
+        "total":"当前目录共",
+        "item":"项",
+        "current":"，当前选中",
+        "file":"文件",
+        "dir":"文件夹"
     }
 }
