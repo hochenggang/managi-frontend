@@ -1,33 +1,145 @@
-**项目名称：** manaji  
+# Managi Frontend
 
-**项目简介：**  
-manaji 是一个开源的VPS管理工具，通过集中化的界面，仅使用SSH通讯，无需在服务器上安装额外软件，即可方便地批量执行命令和查看状态。适合需要把玩多台服务器的场景，简单高效。  
+轻量级网页版 SSH 管理工具前端
 
-**功能特点：**  
+## 技术栈
 
-1. **纯SSH通讯**  
-   - 仅依赖SSH连接，无需在服务器上安装任何额外软件，开箱即用。  
+| 技术 | 版本 |
+|------|------|
+| Vue 3 | 3.x |
+| TypeScript | 5.x |
+| Vite | - |
+| Pinia | - |
+| vue-i18n | - |
+| xterm.js | - |
 
-2. **批量命令执行**  
-   - 支持将命令同时发送到多台VPS执行，避免逐个登录操作，提升效率。  
+## 项目结构
 
-3. **集中化管理**  
-   - 所有VPS的登录信息保存在浏览器本地缓存中，支持导入导出，方便迁移和管理。  
+```
+managi-frontend-vue3/
+├── src/
+│   ├── api.ts              # API 封装 (HTTP/WebSocket)
+│   ├── helper.ts           # 通用工具函数
+│   ├── i18n.ts            # 国际化配置
+│   ├── main.ts            # 应用入口
+│   ├── App.vue            # 根组件
+│   ├── assets/
+│   │   ├── base.css      # CSS 变量定义
+│   │   └── main.css      # 全局样式
+│   ├── components/
+│   │   ├── Finder.vue    # SFTP 文件管理器
+│   │   ├── NodeList.vue  # 节点列表
+│   │   ├── AddNode.vue   # 添加节点弹窗
+│   │   ├── Modal.vue     # 通用弹窗
+│   │   └── ...
+│   ├── views/
+│   │   ├── XtremView.vue # Web SSH 终端
+│   │   └── CmdsView.vue  # 批量命令执行
+│   ├── stores/
+│   │   └── nodesStore.ts # 节点状态管理
+│   ├── router/
+│   │   └── index.ts      # 路由配置
+│   └── locales/
+│       ├── zh.json        # 中文翻译
+│       └── en.json        # 英文翻译
+└── package.json
+```
 
-4. **轻量简洁**  
-   - 界面简洁，操作直观，专注于核心功能，无多余负担。  
+## 核心功能
 
-**适用场景：**  
-- 需要同时管理多台VPS的用户  
-- 希望快速批量执行命令的场景  
-- 喜欢轻量化工具的用户  
+### 1. 批量命令执行
+- 选择多个节点，一键执行命令
+- 实时显示执行结果和耗时
+- 支持命令快捷方式保存
 
-**技术实现：**  
-- 前端：HTML/CSS/JavaScript  
-- 存储：浏览器本地缓存（LocalStorage  
+### 2. Web SSH 终端
+- 基于 xterm.js 的浏览器终端
+- 支持终端尺寸自适应
+- 心跳保活，自动重连
 
-**开源协议：**  
-本项目采用 [MIT 协议](https://opensource.org/licenses/MIT)，欢迎自由使用和贡献。  
+### 3. SFTP 文件管理
+- 目录浏览、上传、下载
+- 创建目录、删除、重命名
+- 进度显示
 
-**贡献指南：**  
-欢迎提交Issue和Pull Request，共同改进项目。
+## 数据存储
+
+| Key | 说明 |
+|-----|------|
+| `cached-nodes` | 节点列表 (JSON) |
+| `shortcuts` | 命令快捷方式 |
+| `managi-api-host` | API 服务器地址 |
+
+### 数据兼容
+- 自动兼容旧版本数据结构 (`ip` → `host`, `ssh_username` → `username`)
+
+## API 封装
+
+```typescript
+// 初始化 API 地址
+initApiHost();
+
+// 获取 API 地址
+getApiHost()      // "127.0.0.1:18001"
+getWsUrl()        // "127.0.0.1:18001"
+getApiUrl()       // "http://127.0.0.1:18001"
+
+// 设置 API 地址
+setApiHost('192.168.1.100:8080');
+
+// 命令执行
+batchSSH(nodes, commands): Promise<CmdsTestResult[]>
+testSSH(node, commands): Promise<CmdsTestResult>
+
+// 节点管理
+getCachedNodes(): Record<string, typeApiNode>
+setCachedNodes(nodes): void
+```
+
+## 快速开始
+
+### 安装依赖
+
+```bash
+npm install
+```
+
+### 开发模式
+
+```bash
+npm run dev
+```
+
+### 构建生产版本
+
+```bash
+npm run build
+```
+
+## 组件设计原则
+
+- **单一职责**: 每个组件只负责一个功能
+- **数据驱动**: 使用 Vue 响应式系统管理状态
+- **TypeScript**: 强类型定义，提升代码可靠性
+- **国际化**: 支持多语言切换
+
+## 样式规范
+
+使用 CSS 变量统一管理主题色：
+
+```css
+:root {
+  --color-main: #9ec1eb;    /* 主色 */
+  --color-sub: #d5e5f7;      /* 辅色 */
+  --color-bg: #e4f0ff79;    /* 背景 */
+  --color-green: #1cad70;   /* 成功 */
+  --color-red: #eb4646;     /* 错误 */
+  --color-orange: #f59b00;   /* 警告 */
+  --color-font-1: #555555;  /* 主文字 */
+  --color-font-2: #555555;  /* 次文字 */
+}
+```
+
+## 许可证
+
+MIT License

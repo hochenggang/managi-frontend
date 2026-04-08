@@ -125,5 +125,18 @@ h2 {
   overflow: auto;
 }
 
+button.sucess {
+  background-color: #4dafff;
+  color: #fff;
+}
+
+button.sucess:hover {
+  background-color: #2196f3;
+}
+
+button.sucess:disabled {
+  background-color: #bbdefb;
+}
+
 
 @media (min-width: 1024px) {}

@@ -1,7 +1,6 @@
 <template>
   <Modal @close="emit('close')">
-    <div class="file-manager" :class="{ progress: uploadCurrentParts > 0 || downloadCurrentParts > 0 }">
-      <!-- 顶部操作栏 -->
+    <div class="file-manager" :class="{ progress: isUploading || isDownloading }">
       <div class="toolbar">
         <div class="path-navigator">
           <span v-for="(part, index) in currentPathParts" :key="index" @click="navigateTo(index)"
@@ -12,31 +11,28 @@
         <div class="actions">
           <button class="small-button" @click="refresh" :title="t('finder.actions.reflush')">
             <svg viewBox="0 0 24 24" width="16" height="16">
-              <path
-                d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+              <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
             </svg>
           </button>
           <button class="small-button" @click="createFolder" :title="t('finder.actions.newDir')">
             <svg viewBox="0 0 24 24" width="16" height="16">
-              <path
-                d="M20 6h-8l-2-2H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-1 8h-3v3h-2v-3h-3v-2h3V9h2v3h3v2z" />
+              <path d="M20 6h-8l-2-2H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-1 8h-3v3h-2v-3h-3v-2h3V9h2v3h3v2z" />
             </svg>
           </button>
-          <button class="small-button" @click="uploadFile" :disabled="uploadCurrentParts > 0"
-            :class="{ uploading: uploadCurrentParts }" :title="t('finder.actions.upload')">
-            <svg v-if="uploadCurrentParts === 0" viewBox="0 0 24 24" width="16" height="16">
+          <button class="small-button" @click="uploadFile" :disabled="isUploading"
+            :class="{ uploading: isUploading }" :title="t('finder.actions.upload')">
+            <svg v-if="!isUploading" viewBox="0 0 24 24" width="16" height="16">
               <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
             </svg>
-            <CirclePercent v-else :percent="(uploadCurrentParts - uploadTotalParts) / uploadTotalParts" />
-
+            <CirclePercent v-else :percent="uploadProgress" />
           </button>
           <button class="small-button" @click="downloadSelected"
-            :disabled="!selectedFile || selectedFile.is_dir || !!downloadCurrentParts"
+            :disabled="!selectedFile || selectedFile.is_dir || isDownloading"
             :title="t('finder.actions.download')">
-            <svg v-if="downloadCurrentParts === 0" viewBox="0 0 24 24" width="16" height="16">
+            <svg v-if="!isDownloading" viewBox="0 0 24 24" width="16" height="16">
               <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
             </svg>
-            <CirclePercent v-else :percent="(downloadTotalParts - downloadCurrentParts) / downloadTotalParts" />
+            <CirclePercent v-else :percent="downloadProgress" />
           </button>
           <button class="small-button" @click="deleteSelected" :disabled="!selectedFile"
             :title="t('finder.actions.delete')">
@@ -47,7 +43,6 @@
         </div>
       </div>
 
-      <!-- 文件列表 -->
       <div class="file-list" @click.prevent="clearSelection">
         <div class="file-list-header">
           <div class="file-name">{{ t('finder.filename') }}</div>
@@ -64,12 +59,10 @@
         </div>
 
         <div v-else class="file-items">
-          <!-- 上级目录 -->
           <div v-show="currentPath.length > 1" class="file-item directory" @dblclick="navigateUp">
             <div class="file-icon">
               <svg viewBox="0 0 24 24" width="24" height="24">
-                <path
-                  d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z" />
+                <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z" />
               </svg>
             </div>
             <div class="file-name">{{ t('finder.upDir') }}</div>
@@ -77,7 +70,6 @@
             <div class="file-modified">-</div>
           </div>
 
-          <!-- 文件列表项 -->
           <div v-for="file in files" :key="file.filename" class="file-item" :class="{
             'selected': selectedFile && selectedFile.filename === file.filename,
             'directory': file.is_dir
@@ -97,20 +89,16 @@
         </div>
       </div>
 
-      <!-- 状态栏 -->
       <div class="status-bar">
         <div class="status-info">
           {{ t("finder.total") }} {{ files.length }} {{ t("finder.item") }}
-
-          {{ selectedFile ? `${t("finder.current")}${selectedFile.is_dir ? t("finder.dir") : t("finder.file")}
-          ${(currentPath === '/' ? '/' : (currentPath + '/')) + selectedFile.filename}` : "" }}
+          {{ selectedFile ? `${t("finder.current")}${selectedFile.is_dir ? t("finder.dir") : t("finder.file")} ${getFullPath(selectedFile.filename)}` : "" }}
         </div>
         <div class="selected-info">
           {{ props.node.name }}
         </div>
       </div>
 
-      <!-- 新建文件夹对话框 -->
       <div v-if="showCreateFolderDialog" class="dialog-overlay">
         <div class="dialog">
           <div class="dialog-header">
@@ -123,35 +111,34 @@
           </div>
           <div class="dialog-footer">
             <button @click="showCreateFolderDialog = false">{{ t("finder.cancle") }}</button>
-            <button @click="confirmCreateFolder" :disabled="!newFolderName">{{ t("finder.ok") }}</button>
+            <button class="sucess" @click="confirmCreateFolder" :disabled="!newFolderName">{{ t("finder.ok") }}</button>
           </div>
         </div>
       </div>
 
-      <!-- 上传文件输入 -->
       <input type="file" ref="fileInput" style="display: none" @change="handleFileUpload" multiple />
     </div>
   </Modal>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
-import { useNodesStore } from '@/stores/nodesStore';
-import { handleError, handleMsg } from "@/helper";
+import { ref, onBeforeUnmount, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { apiHost, type typeApiNode } from '@/api';
 import Modal from "@/components/Modal.vue";
 import CirclePercent from "@/components/CirclePercent.vue";
+import { getWsUrl } from '@/api';
+import { handleError, handleMsg } from "@/helper";
+import type { typeApiNode } from '@/api';
 
 const { t } = useI18n();
 
 const props = defineProps<{
   node: typeApiNode;
-}>()
+}>();
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close']);
 
-interface typeSFTPFile {
+interface SFTPFile {
   filename: string;
   size: number;
   mode: number;
@@ -159,342 +146,361 @@ interface typeSFTPFile {
   mtime: number;
 }
 
-interface typeSFTPResponse {
+interface SFTPResponse {
+  type?: string;
   success: boolean;
   message?: string;
   path?: string;
-  files?: typeSFTPFile[];
+  files?: SFTPFile[];
   filename?: string;
   size?: number;
   complete?: boolean;
+  progress?: number;
+  operation?: string;
 }
 
 const ws = ref<WebSocket | null>(null);
 const currentPath = ref('/');
-const files = ref<typeSFTPFile[]>([]);
-const selectedFile = ref<typeSFTPFile | null>(null);
+const files = ref<SFTPFile[]>([]);
+const selectedFile = ref<SFTPFile | null>(null);
 const loading = ref(false);
 const showCreateFolderDialog = ref(false);
 const newFolderName = ref('');
 const fileInput = ref<HTMLInputElement | null>(null);
-const isClosing = ref(false);
-const downloadCurrentParts = ref(0);
-const downloadTotalParts = ref(0);
-const uploadCurrentParts = ref(0);
-const uploadTotalParts = ref(0);
 
-// WebSocket 连接管理
-const connectWebSocket = () => {
-  if (ws.value) { return }
-  loading.value = true
-  handleMsg(t("finder.connectting"))
-  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  ws.value = new WebSocket(`${protocol}//${apiHost}/ws/sftp`);
+const isUploading = ref(false);
+const isDownloading = ref(false);
+const uploadProgress = ref(0);
+const downloadProgress = ref(0);
+const downloadFilename = ref('');
+const downloadBuffer: Uint8Array[] = [];
+let downloadTotalSize = 0;
+let downloadReceivedSize = 0;
 
-  ws.value.onopen = () => {
-    console.log('SFTP WebSocket connected');
-    // 发送节点信息
-    if (ws.value) {
-      ws.value.send(JSON.stringify(props.node));
-      listDirectory(currentPath.value);
+const uploadQueue: Array<{ file: File; path: string }> = [];
+const isConnected = ref(false);
+
+let pendingResponse: {
+  resolve: (value: SFTPResponse) => void;
+  reject: (reason?: any) => void;
+  timeout: ReturnType<typeof setTimeout>;
+} | null = null;
+
+const connectWebSocket = (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    if (ws.value?.readyState === WebSocket.OPEN && isConnected.value) {
+      resolve();
+      return;
     }
-  };
 
-  ws.value.onclose = () => {
-    handleError(t("finder.disconnected"));
-    if (!isClosing) {
-      handleMsg(t("finder.reconnecting"))
-      setTimeout(() => {
-        connectWebSocket();
-      }, 2000);
+    loading.value = true;
+    handleMsg(t("finder.connecting"));
 
-    }
-  };
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${getWsUrl()}/ws/sftp`;
+    ws.value = new WebSocket(wsUrl);
+    console.log('[SFTP] WebSocket created, URL:', wsUrl);
 
-  ws.value.onerror = (error) => {
-    console.log("error", error)
-    handleError(`${t("finder.error")}`);
-  };
+    ws.value.onopen = () => {
+      console.log('[SFTP] WebSocket connected, sending node info');
+      ws.value?.send(JSON.stringify(props.node));
+    };
 
-  ws.value.onmessage = (event) => {
-    const response: typeSFTPResponse = JSON.parse(event.data);
+    ws.value.onmessage = (event) => {
+      console.log('[SFTP] Received message:', event.data);
+      try {
+        if (event.data instanceof ArrayBuffer || event.data instanceof Blob) {
+          if (event.data instanceof Blob) {
+            event.data.arrayBuffer().then((buffer) => {
+              const chunk = new Uint8Array(buffer);
+              downloadBuffer.push(chunk);
+              downloadReceivedSize += chunk.length;
 
-    if (response.success) {
-      if (response.files) {
-        // 目录列表响应
-        files.value = response.files;
-        loading.value = false;
-      } else if (response.complete) {
-        // 下载完成
-        handleMsg(t("finder.downloaded"));
-      } else if (response.message) {
-        if (response.message.includes("uploaded")) {
-          handleMsg(t("finder.uploaded"));
-          uploadCurrentParts.value = 0
-          refresh()
+              const progress = downloadTotalSize > 0 
+                ? Math.round((downloadReceivedSize / downloadTotalSize) * 100) 
+                : 0;
+              downloadProgress.value = progress / 100;
+
+              if (progress >= 100) {
+                const fullData = new Uint8Array(downloadReceivedSize);
+                let offset = 0;
+                for (const chunk of downloadBuffer) {
+                  fullData.set(chunk, offset);
+                  offset += chunk.length;
+                }
+
+                const blob = new Blob([fullData], { type: 'application/octet-stream' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = downloadFilename.value || 'download';
+                a.click();
+                URL.revokeObjectURL(url);
+                handleMsg(t("finder.downloaded"));
+
+                downloadBuffer.length = 0;
+                downloadReceivedSize = 0;
+                downloadTotalSize = 0;
+                isDownloading.value = false;
+                downloadProgress.value = 0;
+              }
+            });
+          }
+          return;
         }
 
+        const data: SFTPResponse = typeof event.data === 'string'
+          ? JSON.parse(event.data)
+          : {};
+
+        if (data.type === 'connected') {
+          isConnected.value = true;
+          resolve();
+          return;
+        }
+
+        if (data.type === 'progress') {
+          if (data.operation === 'download') {
+            downloadProgress.value = (data.progress || 0) / 100;
+          }
+          return;
+        }
+
+        if (!data.success && data.message) {
+          handleError(data.message);
+          loading.value = false;
+          return;
+        }
+
+        if (pendingResponse) {
+          clearTimeout(pendingResponse.timeout);
+          pendingResponse.resolve(data);
+          pendingResponse = null;
+        }
+
+        if (data.files) {
+          files.value = data.files;
+          loading.value = false;
+        }
+
+        if (data.message?.includes('uploaded')) {
+          handleMsg(t("finder.uploaded"));
+          isUploading.value = false;
+          uploadProgress.value = 0;
+          refresh();
+        }
+
+        if (data.complete) {
+          isDownloading.value = false;
+          downloadProgress.value = 0;
+        }
+      } catch (e) {
+        console.error('Parse error:', e);
       }
-    } else {
-      handleError(response.message || t("finder.error"));
-      loading.value = false;
-    }
-  };
+    };
+
+    ws.value.onclose = () => {
+      isConnected.value = false;
+      if (!isClosing) {
+        handleError(t("finder.disconnected"));
+      }
+    };
+
+    ws.value.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      handleError(t("finder.error"));
+      reject(error);
+    };
+  });
 };
 
-// 列出目录内容
-const listDirectory = (path: string) => {
-  if (!ws.value) return;
-  console.log('listDirectory', path)
-  selectedFile.value = null;
+let isClosing = false;
 
+const sendRequest = async (operation: string, data: Record<string, unknown> = {}): Promise<SFTPResponse> => {
+  if (!ws.value || ws.value.readyState !== WebSocket.OPEN) {
+    throw new Error('WebSocket not connected');
+  }
+
+  const message = { operation, ...data };
+  console.log('[SFTP] sendRequest:', message);
+
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      console.log('[SFTP] Request timeout');
+      if (pendingResponse) {
+        pendingResponse.reject(new Error('Request timeout'));
+        pendingResponse = null;
+      }
+    }, 30000);
+
+    pendingResponse = { resolve, reject, timeout };
+    ws.value!.send(JSON.stringify(message));
+  });
+};
+
+const getFullPath = (filename: string): string => {
+  return currentPath.value === '/' ? `/${filename}` : `${currentPath.value}/${filename}`;
+};
+
+const listDirectory = async (path: string): Promise<void> => {
+  selectedFile.value = null;
   loading.value = true;
   currentPath.value = path;
 
-  const request = {
-    operation: 'list',
-    remote_path: path
-  };
+  console.log('[SFTP] Sending list request for:', path);
 
-  ws.value.send(JSON.stringify(request));
+  try {
+    const response = await sendRequest('list', { remote_path: path });
+    console.log('[SFTP] List response:', response);
+    if (response.files) {
+      files.value = response.files;
+    }
+  } catch (e) {
+    console.error('[SFTP] List error:', e);
+    handleError(String(e));
+  } finally {
+    loading.value = false;
+  }
 };
 
-// 导航到上级目录
+const refresh = () => listDirectory(currentPath.value);
+
 const navigateUp = () => {
   if (currentPath.value === '/') return;
-
   const newPath = currentPath.value.split('/').slice(0, -1).join('/') || '/';
   listDirectory(newPath);
 };
 
-// 导航到指定路径
 const navigateTo = (index: number) => {
-  console.log("navigateTo", currentPathParts.value.slice(0, index + 1))
   const newPath = currentPathParts.value.slice(0, index + 1).join('/');
   listDirectory(newPath);
 };
 
-// 处理文件双击
-const handleFileDoubleClick = (file: typeSFTPFile) => {
-  console.log('handleFileDoubleClick', file);
+const handleFileDoubleClick = (file: SFTPFile) => {
   if (file.is_dir) {
-    const newPath = currentPath.value === '/' ? `/${file.filename}` : `${currentPath.value}/${file.filename}`
-    listDirectory(newPath);
-  } else {
-
-    // downloadFile(file);
+    listDirectory(getFullPath(file.filename));
   }
 };
 
-// 选择文件
-const selectFile = (file: typeSFTPFile) => {
-  console.log('selectFile', file)
+const selectFile = (file: SFTPFile) => {
   selectedFile.value = file;
 };
 
 const clearSelection = () => {
-  console.log('clearSelection')
   selectedFile.value = null;
 };
 
-// 刷新当前目录
-const refresh = () => {
-  listDirectory(currentPath.value);
-};
-
-// 创建文件夹
 const createFolder = () => {
   showCreateFolderDialog.value = true;
   newFolderName.value = '';
 };
 
-// 确认创建文件夹
-const confirmCreateFolder = () => {
-  if (!ws.value || !newFolderName.value) return;
+const confirmCreateFolder = async () => {
+  if (!newFolderName.value) return;
 
-  const path = currentPath.value === '/'
-    ? `/${newFolderName.value}`
-    : `${currentPath.value}/${newFolderName.value}`;
+  try {
+    const path = currentPath.value === '/'
+      ? `/${newFolderName.value}`
+      : `${currentPath.value}/${newFolderName.value}`;
 
-  const request = {
-    operation: 'mkdir',
-    remote_path: path
-  };
-
-  ws.value.send(JSON.stringify(request));
-  showCreateFolderDialog.value = false;
-
-  // 刷新目录
-  setTimeout(refresh, 500);
-};
-
-// 上传文件
-const uploadFile = () => {
-  if (fileInput.value) {
-    fileInput.value.click();
+    await sendRequest('mkdir', { remote_path: path });
+    showCreateFolderDialog.value = false;
+    setTimeout(refresh, 300);
+  } catch (e) {
+    handleError(String(e));
   }
 };
 
+const uploadFile = () => {
+  fileInput.value?.click();
+};
 
-
-// 处理文件上传
 const handleFileUpload = async (event: Event) => {
-  if (!ws.value) return;
-
-
   const input = event.target as HTMLInputElement;
   if (!input.files || input.files.length === 0) return;
-  uploadCurrentParts.value = 0
 
-  for (let i = 0; i < input.files.length; i++) {
-    const file = input.files[i];
+  uploadQueue.length = 0;
+  for (const file of input.files) {
+    const path = currentPath.value === '/'
+      ? `/${file.name}`
+      : `${currentPath.value}/${file.name}`;
+    uploadQueue.push({ file, path });
+  }
+
+  input.value = '';
+  await processUploadQueue();
+};
+
+const processUploadQueue = async (): Promise<void> => {
+  if (uploadQueue.length === 0) return;
+
+  isUploading.value = true;
+  const { file, path } = uploadQueue.shift()!;
+
+  try {
+    uploadProgress.value = 0;
+    await sendRequest('upload', { remote_path: path });
+
     const reader = new FileReader();
-
     reader.onload = async (e) => {
-      const path = currentPath.value === '/'
-        ? `/${file.name}`
-        : `${currentPath.value}/${file.name}`;
+      if (e.target?.result && ws.value?.readyState === WebSocket.OPEN) {
+        const data = e.target.result as ArrayBuffer;
+        ws.value.send(data);
+        uploadProgress.value = 100;
 
-      // 先发送操作请求
-      const request = {
-        operation: 'upload',
-        remote_path: path
-      };
-
-      ws.value?.send(JSON.stringify(request));
-
-      // 然后发送文件数据
-      if (e.target?.result) {
-        const fileData = e.target.result as ArrayBuffer;
-        uploadTotalParts.value = Math.ceil(fileData.byteLength);
-        ws.value?.send(fileData);
-        // 如果网络层大小，大于总量的 0.1%，实时更新数据
-        while (ws.value && ws.value.bufferedAmount > uploadTotalParts.value * 0.1) {
-          uploadCurrentParts.value = ws.value.bufferedAmount;
-          await new Promise(resolve => setTimeout(resolve, 100));
+        if (uploadQueue.length > 0) {
+          await processUploadQueue();
         }
-
-
       }
     };
-
     reader.readAsArrayBuffer(file);
-  }
-
-  // 清空输入以便可以重复选择同一文件
-  input.value = '';
-};
-
-// 下载选中的文件
-const downloadSelected = () => {
-  if (selectedFile.value && !selectedFile.value.is_dir) {
-    downloadFile(selectedFile.value);
+  } catch (e) {
+    handleError(String(e));
+    isUploading.value = false;
   }
 };
 
+const downloadSelected = async () => {
+  if (!selectedFile.value || selectedFile.value.is_dir) return;
 
-// 下载文件
-const downloadFile = (file: typeSFTPFile) => {
-  if (!ws.value) return;
+  isDownloading.value = true;
+  downloadProgress.value = 0;
+  downloadFilename.value = selectedFile.value.filename;
+  downloadBuffer.length = 0;
+  downloadReceivedSize = 0;
+  downloadTotalSize = selectedFile.value.size || 0;
 
-  const path = currentPath.value === '/'
-    ? `/${file.filename}`
-    : `${currentPath.value}/${file.filename}`;
+  const path = getFullPath(selectedFile.value.filename);
 
-  const request = {
-    operation: 'download',
-    remote_path: path
-  };
+  try {
+    const response = await sendRequest('download', { remote_path: path });
 
-  ws.value.send(JSON.stringify(request));
-
-  ws.value.binaryType = 'arraybuffer';
-
-  // 临时保存文件名
-  const downloadFilename = file.filename;
-
-  // 创建一个数组来存储接收到的二进制数据块
-  const chunks: ArrayBuffer[] = [];
-
-  // 标记是否正在接收数据
-  downloadCurrentParts.value = Math.round(file.size / 8096);
-  downloadTotalParts.value = downloadCurrentParts.value;
-
-
-  // 保存原始的消息处理器
-  const originalOnMessage = ws.value.onmessage;
-
-  // 自定义消息处理器
-  ws.value.onmessage = (event) => {
-    if (typeof event.data === 'string') {
-      const response = JSON.parse(event.data);
-      if (response.complete) {
-        // 下载成功，处理所有接收到的数据
-        downloadCurrentParts.value = 0;
-        console.log('chunks', chunks)
-
-        // 拼接所有数据块
-        const totalLength = chunks.reduce((acc, chunk) => acc + chunk.byteLength, 0);
-        const concatenated = new Uint8Array(totalLength);
-        let offset = 0;
-        for (const chunk of chunks) {
-          concatenated.set(new Uint8Array(chunk), offset);
-          offset += chunk.byteLength;
-        }
-
-        // 生成 Blob 并触发下载
-        const blob = new Blob([concatenated], { type: 'application/octet-stream' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = downloadFilename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        // 恢复原始消息处理器
-        ws.value!.onmessage = originalOnMessage;
-
-      }
-    } else {
-      // 接收到二进制数据块
-      chunks.push(event.data);
-      downloadCurrentParts.value -= 1;
+    if (!response.success) {
+      handleError(response.message || 'Download failed');
+      isDownloading.value = false;
+      return;
     }
-  };
+  } catch (e) {
+    handleError(String(e));
+    isDownloading.value = false;
+  }
 };
 
-// 删除选中的文件
-const deleteSelected = () => {
-  if (selectedFile.value) {
-    if (confirm(`${t("finder.deleteConfire")} \n${selectedFile.value.filename}`)) {
-      deleteFile(selectedFile.value);
+const deleteSelected = async () => {
+  if (!selectedFile.value) return;
+
+  if (confirm(`${t("finder.deleteConfire")}\n${selectedFile.value.filename}`)) {
+    try {
+      const path = getFullPath(selectedFile.value.filename);
+      await sendRequest('delete', { remote_path: path });
+      setTimeout(refresh, 300);
+    } catch (e) {
+      handleError(String(e));
     }
   }
 };
 
-// 删除文件
-const deleteFile = (file: typeSFTPFile) => {
-  if (!ws.value) return;
-
-  const path = currentPath.value === '/'
-    ? `/${file.filename}`
-    : `${currentPath.value}/${file.filename}`;
-
-  const request = {
-    operation: 'delete',
-    remote_path: path
-  };
-
-  ws.value.send(JSON.stringify(request));
-
-  // 刷新目录
-  setTimeout(refresh, 500);
-};
-
-// 格式化文件大小
-const formatFileSize = (bytes: number) => {
+const formatFileSize = (bytes: number): string => {
   if (bytes === 0) return '0 B';
   const k = 1024;
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -502,27 +508,31 @@ const formatFileSize = (bytes: number) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
 
-// 格式化日期
-const formatDate = (timestamp: number) => {
+const formatDate = (timestamp: number): string => {
   return new Date(timestamp * 1000).toLocaleString();
 };
 
-// 计算当前路径的各个部分
 const currentPathParts = computed(() => {
-  // 需要把 / 单独作为一个 part 来便于回到根目录
   const parts = currentPath.value.split('/').filter(part => part !== '').map(part => `${part}/`);
-  console.log('currentPathParts', parts)
-  return ['/'].concat(parts)
+  return ['/'].concat(parts);
 });
 
-onMounted(() => {
-  connectWebSocket();
-});
+const init = async () => {
+  try {
+    await connectWebSocket();
+    await listDirectory('/');
+  } catch (e) {
+    console.error('Connection failed:', e);
+  }
+};
+
+init();
 
 onBeforeUnmount(() => {
-  isClosing.value = true;
+  isClosing = true;
   if (ws.value) {
     ws.value.close();
+    ws.value = null;
   }
 });
 </script>
@@ -533,24 +543,18 @@ onBeforeUnmount(() => {
   flex-direction: column;
   height: 100%;
   background-color: var(--color-bg);
-
   border-radius: 4px;
   overflow: auto;
-
   width: 100%;
   min-width: 50rem;
   height: 90%;
   min-height: 30rem;
   max-height: 90%;
-
-
 }
 
 .progress {
   cursor: progress;
-
 }
-
 
 .toolbar {
   display: flex;
@@ -558,11 +562,8 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   height: 3rem;
   width: 100%;
-
-  align-items: center;
   padding: 8px 16px;
   border-bottom: 1px solid #e0e0e0;
-
   color: var(--color-font-1);
   background-color: var(--color-while);
 }
@@ -597,18 +598,15 @@ onBeforeUnmount(() => {
   display: flex;
   gap: 8px;
   height: 1.75rem;
-
 }
 
 .actions button {
   flex-shrink: 0;
-
   display: flex;
   align-items: center;
   justify-content: center;
   width: auto;
   height: auto;
-
 }
 
 .actions button:hover {
@@ -627,7 +625,6 @@ onBeforeUnmount(() => {
   fill: var(--color-main);
 }
 
-
 .uploading {
   cursor: progress;
 }
@@ -638,7 +635,6 @@ onBeforeUnmount(() => {
   display: block;
   height: 30rem;
   background-color: var(--color-while);
-
 }
 
 .file-list-header {
@@ -722,7 +718,6 @@ onBeforeUnmount(() => {
   position: absolute;
   height: 2rem;
   width: 100%;
-
   bottom: 0;
   left: 0;
   display: flex;
@@ -795,13 +790,5 @@ onBeforeUnmount(() => {
   cursor: pointer;
 }
 
-.dialog-footer button:last-child {
-  background-color: #2196f3;
-  color: #fff;
-  border: none;
-}
 
-.dialog-footer button:last-child:disabled {
-  background-color: #bbdefb;
-}
 </style>

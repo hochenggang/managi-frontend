@@ -10,6 +10,7 @@ button {
   display: flex;
   justify-content: center;
   align-items: center;
+  line-height: 1.25;
 }
 </style>
 
