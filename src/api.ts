@@ -94,7 +94,13 @@ let apiHostValue = '';
 export const initApiHost = () => {
     if (!apiHostValue) {
         const stored = localStorage.getItem('managi-api-host');
-        apiHostValue = stored || '127.0.0.1:18001';
+        if (stored) {
+            apiHostValue = stored;
+        } else {
+            const { protocol, hostname, port } = window.location;
+            const isHttps = protocol === 'https:';
+            apiHostValue = isHttps ? hostname : `${hostname}${port ? ':' + port : ''}`;
+        }
     }
 };
 
@@ -115,7 +121,8 @@ export const getWsUrl = (): string => {
 
 export const getApiUrl = (): string => {
     initApiHost();
-    return `http://${apiHostValue}`;
+    const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
+    return `${protocol}//${apiHostValue}`;
 };
 
 export const testSSH = async (node: typeApiNode, cmds: typeCmds): Promise<typeCmdsTestResult> => {
